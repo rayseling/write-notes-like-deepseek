@@ -35,6 +35,9 @@ jobs:
           npx tsx skills/write-notes-like-deepseek/scripts/verify-agent-note-format.ts
           npx tsx skills/write-notes-like-deepseek/scripts/verify-archived-agent-notes.ts
 
+      - name: Verify relative links across every skill
+        run: npm run verify-md-links
+
   install:
     runs-on: ubuntu-latest
     steps:

@@ -14,6 +14,8 @@ npx skills add czm15053/write-notes-like-deepseek
 
 📺 先看效果：[在线演示看板](https://czm15053.github.io/write-notes-like-deepseek-demo/)（内置 1,196 篇来自 DeepSeek Harness 的真实决策笔记，可脱机浏览）
 
+笔记只是 DeepSeek Harness 方法的一根支柱。本仓库另外搬了他们的指令分层、门禁、推送前选测、升级指南、错误处理与散文纪律共七个 Skill，同一条命令一起装上——见[不止笔记](#不止笔记从-deepseek-harness-搬来的全套-skill)。
+
 ---
 
 ## 当 AI 每天帮你交十几个 PR，代码库会怎样失控
@@ -293,14 +295,38 @@ npx tsx .agents/skills/write-notes-like-deepseek/scripts/build-board.ts --bundle
 
 ---
 
+## 不止笔记：从 DeepSeek Harness 搬来的全套 Skill
+
+笔记解决「为什么这样定」。DSH 还用另外几套机制回答「规矩怎么被读到、怎么被强制、改了怎么证明、破了怎么记账」。每一项都对应 DSH 仓库里实际存在的 skill 或脚本，按中文单语、零依赖（`npx tsx`）裁剪，**不加 DSH 没有的东西**：
+
+| Skill | 解决什么 | 搬自 DSH 的什么 | 形态 |
+|---|---|---|---|
+| [`write-notes-like-deepseek`](skills/write-notes-like-deepseek/SKILL.md) | 决策与被否方案留在仓库里 | `.agents/notes/` 体系 + 三条 verify 脚本 | skill + 脚本 |
+| [`dsh-layer-instructions`](skills/dsh-layer-instructions/SKILL.md) | 规则读得到、读得完：根 `AGENTS.md` 一屏 + 目录就近 + skill 按需；字数上限只降不升 | `AGENTS.md` 结构、`CLAUDE.md` 符号链接、`verify-doc-budgets.ts` | skill + 脚本 + 模板 |
+| [`dsh-gate-every-rule`](skills/dsh-gate-every-rule/SKILL.md) | 规则必有门：每条规则配一道能拒掉反例的脚本；逃生口只减不增；本地 hook 窄、CI 宽 | `run-gates.ts`、`verify-md-links.ts`、`verify-no-unknown-casts.ts`、`lefthook.yml` | skill + 脚本 + 模板 |
+| [`dsh-pre-push-checks`](skills/dsh-pre-push-checks/SKILL.md) | 推送前按改动面选最小证据，不反射式全量、不空手说 done | `dsh-pre-push-checks` skill、`change-scope.ts` | skill + 脚本 |
+| [`dsh-create-upgrade-guide`](skills/dsh-create-upgrade-guide/SKILL.md) | 破坏外部可见表面的改动同批写升级指南 | `dsh-create-upgrade-guide` skill、`verify-upgrade-guides.ts` | skill + 脚本 + 模板 |
+| [`dsh-error-handling`](skills/dsh-error-handling/SKILL.md) | 类型化失败、处理归属与遏制范围、不确定状态必须可见、空 catch 点名原因 | `dsh-error-handling` skill | skill |
+| [`dsh-prose-standard`](skills/dsh-prose-standard/SKILL.md) | 注释与文档写契约不写推导；各位置的必需覆盖 | `dsh-prose-standard` skill 与示例 | skill |
+| [`dsh-trim-cot-leakage`](skills/dsh-trim-cot-leakage/SKILL.md) | 清除会话痕迹：死引用、「不再」、「本 PR」、对评审者的辩护 | `dsh-trim-cot-leakage` skill、示例与召回探针 | skill |
+
+**它们怎么被用上**：你基本不用点名。`AGENTS.md` 在规则旁边链接到 skill（`templates/AGENTS.root.md` 已接好），每个 `SKILL.md` 的 `description` 写成 "Use when …" 触发条件，Claude Code / Codex 在任务匹配时自动加载；脚本走 git hook 和 CI 自动跑。只有 agent 漏了（「先按 dsh-pre-push-checks 选证据」）或做专项审计（「用 dsh-trim-cot-leakage 过一遍 docs/」）时才需要点名。
+
+**装完的起步顺序**：`dsh-layer-instructions` 起草 `AGENTS.md` → `dsh-gate-every-rule` 建 `.agents/gates.json` 与 `lefthook.yml` → 其余 skill 由 `AGENTS.md` 的链接和 description 自动触发。
+
+**故意不搬的**（绑定 DSH 自身规模或 GitHub）：双语三件套、100% 覆盖率门、录制快照基建、栈式 PR 合并、标签分类法、产品包策略。
+
+---
+
 ## 仓库导览
 
-- [`SKILL.md`](skills/write-notes-like-deepseek/SKILL.md)：装给 AI 的主契约——先判「要不要写」，再谈怎么写。
+- [`skills/write-notes-like-deepseek/SKILL.md`](skills/write-notes-like-deepseek/SKILL.md)：装给 AI 的主契约——先判「要不要写」，再谈怎么写。
 - [`templates/`](skills/write-notes-like-deepseek/templates/)：`proposed` / `implemented` / `rejected` 三份填空模板。
 - [`references/when-to-write.md`](skills/write-notes-like-deepseek/references/when-to-write.md)：什么时候写、什么时候原地改、什么时候归档。
 - [`references/archiving.md`](skills/write-notes-like-deepseek/references/archiving.md)：封存规矩——被取代的老决定怎么干净归档。
 - [`references/quality-gate.md`](skills/write-notes-like-deepseek/references/quality-gate.md)：写完笔记后的语义自检清单。
 - [`references/verification.md`](skills/write-notes-like-deepseek/references/verification.md)：每个校验脚本在查什么、为什么。
+- [`skills/dsh-*/`](skills/)：上表的七个 Skill，各自带 `SKILL.md`、`scripts/`、`templates/`、`references/`。
 
 
 
@@ -310,14 +336,14 @@ npx tsx .agents/skills/write-notes-like-deepseek/scripts/build-board.ts --bundle
 
 ## 许可证
 
-[MIT](LICENSE)
+[MIT](LICENSE)。`skills/dsh-*/` 下的脚本与 skill 正文移植自 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（MIT，Copyright (c) 2026 DeepSeek），每个文件头部注明了对应的上游来源。
 
 ## 仓库维护与安装内容
 
-可安装内容集中在 `skills/write-notes-like-deepseek/`，包含 `SKILL.md`、`references/`、`templates/`、`scripts/` 和看板模板 `assets/agent-notes-board.html`。根目录的 README 配图、CI、导入示例笔记和配图导出脚本用于维护本仓库。
+可安装内容集中在 `skills/<name>/`：`write-notes-like-deepseek/`（含看板模板 `assets/agent-notes-board.html`）和七个 `dsh-*/`，各自带 `SKILL.md` 与按需的 `references/`、`templates/`、`scripts/`。根目录的 README 配图、CI、导入示例笔记和配图导出脚本用于维护本仓库。
 
-原安装命令 `npx skills add czm15053/write-notes-like-deepseek` 保持不变，无需指定 `--skill`。安装器负责发现子目录中的 Skill 并放入所选 Agent 的安装位置。
+原安装命令 `npx skills add czm15053/write-notes-like-deepseek` 保持不变，无需指定 `--skill`。安装器负责发现子目录中的全部 Skill 并放入所选 Agent 的安装位置；只要其中一部分时加 `--skill <name>`。
 
-维护本仓库时，在仓库根目录执行 `npm run verify-notes`、`npm run init-board` 或 `npm run bundle-board`；`board.html` 和 `demo.html` 均为生成产物。下游项目需自行配置上文的 npm scripts。
+维护本仓库时，在仓库根目录执行 `npm run verify-notes`、`npm run verify-md-links`、`npm run init-board` 或 `npm run bundle-board`；`board.html` 和 `demo.html` 均为生成产物。下游项目需自行配置上文的 npm scripts。
 
 运行 `npm run test-skill-install` 可在临时宿主项目中验证安装边界、Codex / Claude Code 安装路径、笔记校验、归档和看板生成。该检查使用固定版本 `skills@1.7.1`，覆盖默认链接和 `--copy` 两种安装方式，且不指定 `--skill`；需要联网获取 CLI 与 tsx，CI 使用 Node.js 24。

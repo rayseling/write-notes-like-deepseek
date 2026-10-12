@@ -56,7 +56,28 @@ try {
     run(host, ['tsx', script('archive-agent-note'), note]);
     run(host, ['tsx', script('verify-archived-agent-notes')]);
     assert.ok(existsSync(join(host, '.agents/notes/archived/process/2026-10-07-install-check.md')));
-    console.log(`ok: ${mode} installation, Codex/Claude paths, host validation, boards, archive`);
+
+    // The seven dsh-* skills install beside the notes skill, and their gates run from the host root.
+    const dshSkills = ['dsh-layer-instructions', 'dsh-gate-every-rule', 'dsh-pre-push-checks', 'dsh-create-upgrade-guide',
+      'dsh-error-handling', 'dsh-prose-standard', 'dsh-trim-cot-leakage'];
+    for (const name of dshSkills) {
+      for (const base of ['.agents/skills', '.claude/skills']) assert.ok(existsSync(join(host, base, name, 'SKILL.md')), `${base}/${name}`);
+    }
+    const gateDir = join(host, '.agents/skills/dsh-gate-every-rule');
+    const instrDir = join(host, '.agents/skills/dsh-layer-instructions');
+    writeFileSync(join(host, 'AGENTS.md'), readFileSync(join(instrDir, 'templates/AGENTS.root.md'), 'utf8'));
+    writeFileSync(join(host, '.agents/doc-budgets.json'), '{ "AGENTS.md": 2000 }\n');
+    writeFileSync(join(host, '.agents/escape-hatches.json'), readFileSync(join(gateDir, 'templates/escape-hatches.json'), 'utf8'));
+    writeFileSync(join(host, '.agents/gates.json'), readFileSync(join(gateDir, 'templates/gates.json'), 'utf8'));
+    mkdirSync(join(host, 'docs'), { recursive: true });
+    writeFileSync(join(host, 'docs/architecture.md'), '# Architecture\n');
+    spawnSync('git', ['init', '-q'], { cwd: host });
+    run(host, ['tsx', join(gateDir, 'scripts/verify-escape-hatch-baseline.ts'), '--init']);
+    run(host, ['tsx', join(gateDir, 'scripts/run-gates.ts')]);
+    // A ceiling below the current word count must fail the budget gate through the runner.
+    writeFileSync(join(host, '.agents/doc-budgets.json'), '{ "AGENTS.md": 10 }\n');
+    run(host, ['tsx', join(gateDir, 'scripts/run-gates.ts'), '--only', 'doc-budgets'], false);
+    console.log(`ok: ${mode} installation, Codex/Claude paths, host validation, boards, archive, dsh-* gates`);
   }
 } finally {
   rmSync(scratch, { recursive: true, force: true });
