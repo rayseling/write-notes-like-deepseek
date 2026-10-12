@@ -1,3 +1,4 @@
+| [`dsh-agent-experience`](skills/dsh-agent-experience/SKILL.md) | 模型可见文本怎么写：工具定义、skill description、注入提示——最小上下文、按需加载、每个事实只说一次、量 token | `agent-experience` skill | skill |
 # write-notes-like-deepseek
 
 > **像 DeepSeek 团队一样维护项目。** 把他们在 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 里用的那套方法，装进你的仓库。
@@ -14,7 +15,7 @@ npx skills add czm15053/write-notes-like-deepseek
 
 📺 先看效果：[在线演示看板](https://czm15053.github.io/write-notes-like-deepseek-demo/)（内置 1,196 篇来自 DeepSeek Harness 的真实决策笔记，可脱机浏览）
 
-笔记只是 DeepSeek Harness 方法的一根支柱。本仓库另外搬了他们的指令分层、门禁、推送前选测、升级指南、错误处理与散文纪律共七个 Skill，同一条命令一起装上——见[不止笔记](#不止笔记从-deepseek-harness-搬来的全套-skill)。
+笔记只是 DeepSeek Harness 方法的一根支柱。本仓库另外搬了他们的指令分层、门禁、推送前选测、升级指南、错误处理、散文纪律与模型可见文本规范共八个 Skill，同一条命令一起装上——见[不止笔记](#不止笔记从-deepseek-harness-搬来的全套-skill)。
 
 ---
 
@@ -326,7 +327,7 @@ npx tsx .agents/skills/write-notes-like-deepseek/scripts/build-board.ts --bundle
 - [`references/archiving.md`](skills/write-notes-like-deepseek/references/archiving.md)：封存规矩——被取代的老决定怎么干净归档。
 - [`references/quality-gate.md`](skills/write-notes-like-deepseek/references/quality-gate.md)：写完笔记后的语义自检清单。
 - [`references/verification.md`](skills/write-notes-like-deepseek/references/verification.md)：每个校验脚本在查什么、为什么。
-- [`skills/dsh-*/`](skills/)：上表的七个 Skill，各自带 `SKILL.md`、`scripts/`、`templates/`、`references/`。
+- [`skills/dsh-*/`](skills/)：上表的八个 Skill，各自带 `SKILL.md`、`scripts/`、`templates/`、`references/`。
 
 
 
@@ -340,9 +341,11 @@ npx tsx .agents/skills/write-notes-like-deepseek/scripts/build-board.ts --bundle
 
 ## 仓库维护与安装内容
 
-可安装内容集中在 `skills/<name>/`：`write-notes-like-deepseek/`（含看板模板 `assets/agent-notes-board.html`）和七个 `dsh-*/`，各自带 `SKILL.md` 与按需的 `references/`、`templates/`、`scripts/`。根目录的 README 配图、CI、导入示例笔记和配图导出脚本用于维护本仓库。
+可安装内容集中在 `skills/<name>/`：`write-notes-like-deepseek/`（含看板模板 `assets/agent-notes-board.html`）和八个 `dsh-*/`，各自带 `SKILL.md` 与按需的 `references/`、`templates/`、`scripts/`。根目录的 README 配图、CI、导入示例笔记和配图导出脚本用于维护本仓库。
 
 原安装命令 `npx skills add czm15053/write-notes-like-deepseek` 保持不变，无需指定 `--skill`。安装器负责发现子目录中的全部 Skill 并放入所选 Agent 的安装位置；只要其中一部分时加 `--skill <name>`。
+
+每个 `SKILL.md` 的 `description` 不能含未加引号的 `: `，否则 YAML 解析失败、`skills add` 会静默跳过该 skill（`test-skill-install` 对每个 skill 断言安装路径，能抓到）。
 
 维护本仓库时，在仓库根目录执行 `npm run verify-notes`、`npm run verify-md-links`、`npm run init-board` 或 `npm run bundle-board`；`board.html` 和 `demo.html` 均为生成产物。下游项目需自行配置上文的 npm scripts。
 

@@ -57,9 +57,9 @@ try {
     run(host, ['tsx', script('verify-archived-agent-notes')]);
     assert.ok(existsSync(join(host, '.agents/notes/archived/process/2026-10-07-install-check.md')));
 
-    // The seven dsh-* skills install beside the notes skill, and their gates run from the host root.
+    // The eight dsh-* skills install beside the notes skill, and their gates run from the host root.
     const dshSkills = ['dsh-layer-instructions', 'dsh-gate-every-rule', 'dsh-pre-push-checks', 'dsh-create-upgrade-guide',
-      'dsh-error-handling', 'dsh-prose-standard', 'dsh-trim-cot-leakage'];
+      'dsh-error-handling', 'dsh-prose-standard', 'dsh-trim-cot-leakage', 'dsh-agent-experience'];
     for (const name of dshSkills) {
       for (const base of ['.agents/skills', '.claude/skills']) assert.ok(existsSync(join(host, base, name, 'SKILL.md')), `${base}/${name}`);
     }
