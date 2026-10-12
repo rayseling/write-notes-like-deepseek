@@ -69,7 +69,7 @@ npx tsx .agents/skills/dsh-layer-instructions/scripts/verify-doc-budgets.ts --li
 
 - 已有 `AGENTS.md` / `CLAUDE.md` → 不换模板，按「落地步骤」分流；它已有字数门禁且打满时，新规则靠下沉旧内容腾位置，不是加字。
 - 已有门禁聚合器（`scripts/check.mjs`、`make check`、`pnpm run gates` 之类）→ **不建 `.agents/gates.json`、不装 lefthook**，把本套的 `verify-*` 脚本作为新条目挂进现有聚合器；两套并行的门禁是最先腐化的那种重复。
-- 已有笔记目录（`notes/`、`docs/adr/`）→ 不建 `.agents/notes/`，设 `AGENT_NOTE_ROOT` 指过去（[write-notes-like-deepseek §6](../write-notes-like-deepseek/SKILL.md#6-校验与运维命令)）。
+- 已有笔记目录（`notes/`、`docs/adr/`）→ 不建 `.agents/notes/`，设 `AGENT_NOTE_ROOT` 指过去，与生命周期无关的旧文件夹用 `AGENT_NOTE_IGNORE` 点名（[write-notes-like-deepseek §6](../write-notes-like-deepseek/SKILL.md#6-校验与运维命令)）。
 - 已有 hook 管理（husky、lefthook、pre-commit）→ 往现有配置加条目，不复制 `templates/lefthook.yml`。
 
 1. **前提**：git 仓库；Node ≥ 20。Node ≥ 23.6 可用 `node` 直接跑下面所有 `.ts`；仓库的 `node_modules` 是符号链接时 `npx tsx` 会失败，也用 `node`。
