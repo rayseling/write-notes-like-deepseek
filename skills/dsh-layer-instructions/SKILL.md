@@ -65,6 +65,13 @@ npx tsx .agents/skills/dsh-layer-instructions/scripts/verify-doc-budgets.ts --li
 
 八个 skill 装好后，在仓库根目录按顺序做完，再开始写代码。需要判断的步骤（起草 `AGENTS.md`、选逃生口模式、定上限）由 agent 对照项目完成，不做成脚本。
 
+**先探测，别造第二套。** 宿主已有的东西沿用，skill 只补缺的部分：
+
+- 已有 `AGENTS.md` / `CLAUDE.md` → 不换模板，按「落地步骤」分流；它已有字数门禁且打满时，新规则靠下沉旧内容腾位置，不是加字。
+- 已有门禁聚合器（`scripts/check.mjs`、`make check`、`pnpm run gates` 之类）→ **不建 `.agents/gates.json`、不装 lefthook**，把本套的 `verify-*` 脚本作为新条目挂进现有聚合器；两套并行的门禁是最先腐化的那种重复。
+- 已有笔记目录（`notes/`、`docs/adr/`）→ 不建 `.agents/notes/`，设 `AGENT_NOTE_ROOT` 指过去（[write-notes-like-deepseek §6](../write-notes-like-deepseek/SKILL.md#6-校验与运维命令)）。
+- 已有 hook 管理（husky、lefthook、pre-commit）→ 往现有配置加条目，不复制 `templates/lefthook.yml`。
+
 1. **前提**：git 仓库；Node ≥ 20。Node ≥ 23.6 可用 `node` 直接跑下面所有 `.ts`；仓库的 `node_modules` 是符号链接时 `npx tsx` 会失败，也用 `node`。
 2. **根指令**：复制 `templates/AGENTS.root.md` 为 `AGENTS.md`，按项目删改「布局」「命令」「约定」三节——只留这个仓库真有的规则和真能跑的命令；`ln -s AGENTS.md CLAUDE.md`。
 3. **门禁配置**（都放 `.agents/`）：
