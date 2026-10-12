@@ -312,7 +312,7 @@ npx tsx .agents/skills/write-notes-like-deepseek/scripts/build-board.ts --bundle
 
 **它们怎么被用上**：你基本不用点名。`AGENTS.md` 在规则旁边链接到 skill（`templates/AGENTS.root.md` 已接好），每个 `SKILL.md` 的 `description` 写成 "Use when …" 触发条件，Claude Code / Codex 在任务匹配时自动加载；脚本走 git hook 和 CI 自动跑。只有 agent 漏了（「先按 dsh-pre-push-checks 选证据」）或做专项审计（「用 dsh-trim-cot-leakage 过一遍 docs/」）时才需要点名。
 
-**装完的起步顺序**：`dsh-layer-instructions` 起草 `AGENTS.md` → `dsh-gate-every-rule` 建 `.agents/gates.json` 与 `lefthook.yml` → 其余 skill 由 `AGENTS.md` 的链接和 description 自动触发。
+**新项目怎么启动**：装完后在仓库里说一句「按 dsh-layer-instructions 初始化」，agent 会按 [新项目启动](skills/dsh-layer-instructions/SKILL.md#新项目启动一次性) 的七步做完（AGENTS.md、gates / escape-hatches / doc-budgets 三份配置、基线、首跑、lefthook、提交）；需要判断的步骤交给 agent，不做成脚本。
 
 **故意不搬的**（绑定 DSH 自身规模或 GitHub）：双语三件套、100% 覆盖率门、录制快照基建、栈式 PR 合并、标签分类法、产品包策略。
 
